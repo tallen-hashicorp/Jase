@@ -32,6 +32,44 @@ We will have another instance of the counting service running on dc2. We will si
 
 We will then observe how the dashboard will failover to the counting service residing on dc2.
 
+# To Run on AWS in 2 DC pattern
+1. Update Helm
+```bash
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo update hashicorp
+```
+
+2. TF for DC1
+```bash
+cd Peering/DC1/DC1-K8cluster/consul-aws-eks-terraform
+terraform init
+terraform apply
+```
+
+3. Connect to eks cluster
+```bash
+aws eks list-clusters --region eu-west-2
+aws eks --region eu-west-2 update-kubeconfig --name cluster1-eks-lJoKSFu8
+kubectl cluster-info
+```
+
+4. Create consul namespace
+```bash
+kubectl create namespace consul
+```
+
+5. Deploy your licence file **NOTE: Update the consul.hclic to your location**
+```bash
+kubectl create secret generic consul-ent-license --namespace consul --from-file=key="/Users/tyler.allen/Documents/projects/consul.hclic"
+```
+
+6. Deploy consul with helm
+```bash
+cd ../../
+consul-k8s install -config-file config-dc1.yaml
+```
+
+
 # Pre-reqs
 
 1. You have two Kubernetes clusters available. In this demo example, we will use Azure Kubernetes Service (AKS) but it can be applied to other K8s clusters.
